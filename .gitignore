@@ -2,6 +2,13 @@
 .env
 .env.example
 node_modules
+
+
+src/
+public/
+vite.config.js
+index.html
+vercel.json
 =======
 # Logs
 logs
