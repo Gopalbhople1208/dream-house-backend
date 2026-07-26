@@ -183,12 +183,11 @@ exports.createSuperAdmin = async (req, res) => {
       message: "Super Admin Created Successfully",
       superadmin: admin,
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  } catch (err) {
+  console.log(err);
+  res.status(500).json({  // ✅ Now sends response
+    success: false,
+    message: err.message || "Login failed",
+  });
+}
 };
