@@ -73,7 +73,7 @@ export const adminAPI = {
 // Utility function to check backend health
 export const checkBackendHealth = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/health');
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/health`);
     return response.data.success;
   } catch (error) {
     console.error('Backend health check failed:', error.message);
