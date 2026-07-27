@@ -117,13 +117,44 @@ exports.loginSuperAdmin = async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-    });
+    // res.json({
+    //   success: true,
+    // });
 
-  } catch (err) {
-    console.log(err);
+    const token = jwt.sign(
+  {
+    id: superadmin._id,
+    role: "superadmin",
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "7d",
   }
+);
+
+res.status(200).json({
+  success: true,
+  message: "Login Successful",
+  token,
+  superadmin: {
+    _id: superadmin._id,
+    name: superadmin.name,
+    email: superadmin.email,
+  },
+});
+
+  } 
+  // catch (err) {
+  //   console.log(err);
+  // }
+  catch (err) {
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    message: err.message,
+  });
+}
 };
 // ==========================
 // Get Profile
@@ -179,7 +210,7 @@ exports.createSuperAdmin = async (req, res) => {
     });
 
     res.status(201).json({
-      success: true,
+      success: true,  
       message: "Super Admin Created Successfully",
       superadmin: admin,
     });

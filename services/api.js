@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 30000, // Increased to 30 seconds for more reliable API calls
   headers: {
     'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export const adminAPI = {
 // Utility function to check backend health
 export const checkBackendHealth = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/health');
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/health`);
     return response.data.success;
   } catch (error) {
     console.error('Backend health check failed:', error.message);
