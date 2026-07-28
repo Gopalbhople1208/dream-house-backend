@@ -81,17 +81,98 @@ const jwt = require("jsonwebtoken");
 
 
 
+// exports.loginSuperAdmin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     console.log("Login Request:", req.body);
+
+//     const superadmin = await SuperAdmin.findOne({
+//       email: email.toLowerCase(),
+//     });
+
+//     console.log("Database User:", superadmin);
+
+//     if (!superadmin) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Super Admin not found",
+//       });
+//     }
+
+//     console.log("Status:", superadmin.status);
+
+//     // const isMatch = await bcrypt.compare(
+//     //   password,
+//     //   superadmin.password
+//     // );
+//     const isMatch = password === superadmin.password;
+
+//     console.log("Password Match:", isMatch);
+
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Email or Password",
+//       });
+//     }
+
+//     // res.json({
+//     //   success: true,
+//     // });
+
+//     const token = jwt.sign(
+//   {
+//     id: superadmin._id,
+//     role: "superadmin",
+//   },
+//   process.env.JWT_SECRET,
+//   {
+//     expiresIn: "7d",
+//   }
+// );
+
+// res.status(200).json({
+//   success: true,
+//   message: "Login Successful",
+//   token,
+//   superadmin: {
+//     _id: superadmin._id,
+//     name: superadmin.name,
+//     email: superadmin.email,
+//   },
+// });
+
+//   } 
+//   // catch (err) {
+//   //   console.log(err);
+//   // }
+//   catch (err) {
+//   console.error(err);
+
+//   res.status(500).json({
+//     success: false,
+//     message: err.message,
+//   });
+// }
+// };
+
 exports.loginSuperAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("Login Request:", req.body);
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and Password are required",
+      });
+    }
+
+    console.log(req.body);
 
     const superadmin = await SuperAdmin.findOne({
       email: email.toLowerCase(),
     });
-
-    console.log("Database User:", superadmin);
 
     if (!superadmin) {
       return res.status(404).json({
@@ -100,61 +181,45 @@ exports.loginSuperAdmin = async (req, res) => {
       });
     }
 
-    console.log("Status:", superadmin.status);
-
-    // const isMatch = await bcrypt.compare(
-    //   password,
-    //   superadmin.password
-    // );
     const isMatch = password === superadmin.password;
-
-    console.log("Password Match:", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Email or Password",
+        message: "Invalid Password",
       });
     }
 
-    // res.json({
-    //   success: true,
-    // });
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET not found");
+    }
 
     const token = jwt.sign(
-  {
-    id: superadmin._id,
-    role: "superadmin",
-  },
-  process.env.JWT_SECRET,
-  {
-    expiresIn: "7d",
+      {
+        id: superadmin._id,
+        role: "superadmin",
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      token,
+      superadmin,
+    });
+
+  } catch (err) {
+    console.error("LOGIN ERROR:");
+    console.error(err);
+
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
-);
-
-res.status(200).json({
-  success: true,
-  message: "Login Successful",
-  token,
-  superadmin: {
-    _id: superadmin._id,
-    name: superadmin.name,
-    email: superadmin.email,
-  },
-});
-
-  } 
-  // catch (err) {
-  //   console.log(err);
-  // }
-  catch (err) {
-  console.error(err);
-
-  res.status(500).json({
-    success: false,
-    message: err.message,
-  });
-}
 };
 // ==========================
 // Get Profile
