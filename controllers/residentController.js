@@ -71,7 +71,7 @@ const loginResident = async (req, res) => {
       });
     }
 
-    const resident = await Resident.findOne({ email });
+    const resident = await Resident.findOne({ email,role: "resident", });
     if (!resident) {
       return res.status(401).json({
         success: false,
