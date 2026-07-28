@@ -58,15 +58,86 @@
   //   }
   // });
 
-  // module.exports = router;
+//   // module.exports = router;
+// const express = require("express");
+// const router = express.Router();
+
+// const bcrypt = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
+
+// const Admin = require("../models/Admin");
+
+// router.post("/login", async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Email and password are required",
+//       });
+//     }
+
+//     const admin = await Admin.findOne({ email });
+
+//     if (!admin) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Admin Email or Password",
+//       });
+//     }
+
+//     const match = await bcrypt.compare(password, admin.password);
+
+//     if (!match) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Admin Email or Password",
+//       });
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         id: admin._id,
+//         role: "admin",
+//       },
+//       process.env.JWT_SECRET,
+//       {
+//         expiresIn: "7d",
+//       }
+//     );
+
+//     res.json({
+//       success: true,
+//       token,
+//       admin: {
+//         id: admin._id,
+//         name: admin.name,
+//         email: admin.email,
+//         role: admin.role,
+//       },
+//     });
+//   } catch (err) {
+//     console.log(err);
+
+//     res.status(500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// });
+
+// module.exports = router;
+
 const express = require("express");
 const router = express.Router();
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const Admin = require("../models/Admin");
 
+// ======================
+// Admin Login
+// ======================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -74,11 +145,14 @@ router.post("/login", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Email and Password are required",
       });
     }
 
-    const admin = await Admin.findOne({ email });
+    // Find admin from Admin collection
+    const admin = await Admin.findOne({
+      email: email.toLowerCase(),
+    });
 
     if (!admin) {
       return res.status(401).json({
@@ -87,42 +161,47 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const match = await bcrypt.compare(password, admin.password);
+    // Compare password
+    const isMatch = await bcrypt.compare(password, admin.password);
 
-    if (!match) {
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid Admin Email or Password",
       });
     }
 
+    // Create JWT
     const token = jwt.sign(
       {
         id: admin._id,
-        role: "admin",
+        email: admin.email,
+        role: admin.role,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "your_jwt_secret_key",
       {
         expiresIn: "7d",
       }
     );
 
-    res.json({
+    res.status(200).json({
       success: true,
+      message: "Admin Login Successful",
       token,
       admin: {
         id: admin._id,
         name: admin.name,
         email: admin.email,
         role: admin.role,
+        status: admin.status,
       },
     });
   } catch (err) {
-    console.log(err);
+    console.error("Admin Login Error:", err);
 
     res.status(500).json({
       success: false,
-      message: err.message,
+      message: "Server Error",
     });
   }
 });
