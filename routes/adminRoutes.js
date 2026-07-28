@@ -1,61 +1,130 @@
-  const express = require("express");
-  const router = express.Router();
-  const bcryptjs = require("bcryptjs");
-  const jwt = require("jsonwebtoken");
-  const Resident = require("../models/Resident");
+  // const express = require("express");
+  // const router = express.Router();
+  // const bcryptjs = require("bcryptjs");
+  // const jwt = require("jsonwebtoken");
+  // const Resident = require("../models/Resident");
 
 
 
-  router.post("/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
+  // router.post("/login", async (req, res) => {
+  //   try {
+  //     const { email, password } = req.body;
 
-      if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: "Email and password are required",
-        });
-      }
+  //     if (!email || !password) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Email and password are required",
+  //       });
+  //     }
 
-      const admin = await Resident.findOne({ email });
-      if (!admin) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid email or password",
-        });
-      }
+  //     const admin = await Resident.findOne({ email });
+  //     if (!admin) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         message: "Invalid email or password",
+  //       });
+  //     }
 
-      const isPasswordValid = await bcryptjs.compare(password, admin.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid email or password",
-        });
-      }
+  //     const isPasswordValid = await bcryptjs.compare(password, admin.password);
+  //     if (!isPasswordValid) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         message: "Invalid email or password",
+  //       });
+  //     }
 
-      const token = jwt.sign(
-        { id: admin._id, email: admin.email, role: "society-admin" },
-        process.env.JWT_SECRET || "your_jwt_secret_key",
-        { expiresIn: "7d" }
-      );
+  //     const token = jwt.sign(
+  //       { id: admin._id, email: admin.email, role: "society-admin" },
+  //       process.env.JWT_SECRET || "your_jwt_secret_key",
+  //       { expiresIn: "7d" }
+  //     );
 
-      res.status(200).json({
-        success: true,
-        message: "Admin login successful",
-        token,
-        admin: {
-          id: admin._id,
-          name: admin.name,
-          email: admin.email,
-        },
-      });
-    } catch (error) {
-      console.error("Admin login error:", error);
-      res.status(500).json({
+  //     res.status(200).json({
+  //       success: true,
+  //       message: "Admin login successful",
+  //       token,
+  //       admin: {
+  //         id: admin._id,
+  //         name: admin.name,
+  //         email: admin.email,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.error("Admin login error:", error);
+  //     res.status(500).json({
+  //       success: false,
+  //       message: error.message || "Admin login failed",
+  //     });
+  //   }
+  // });
+
+  // module.exports = router;
+const express = require("express");
+const router = express.Router();
+
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const Admin = require("../models/Admin");
+
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
         success: false,
-        message: error.message || "Admin login failed",
+        message: "Email and password are required",
       });
     }
-  });
 
-  module.exports = router;
+    const admin = await Admin.findOne({ email });
+
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Admin Email or Password",
+      });
+    }
+
+    const match = await bcrypt.compare(password, admin.password);
+
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Admin Email or Password",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: admin._id,
+        role: "admin",
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.json({
+      success: true,
+      token,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+module.exports = router;
