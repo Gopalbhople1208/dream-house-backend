@@ -37,7 +37,7 @@ const {
 
 } = require("../controllers/residentController");
 
-router.post("/", registerResident);
+router.post("/register", registerResident);
 router.post("/login", loginResident);
 
 router.get("/", getAllResidents);
