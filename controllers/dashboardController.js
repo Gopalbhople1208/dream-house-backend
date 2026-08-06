@@ -1,4 +1,4 @@
-const Society = require("../models/Society");
+const Society = require("../models/society");
 const Resident = require("../models/Resident");
 const Staff = require("../models/Staff");
 const Amenity = require("../models/Amenity");

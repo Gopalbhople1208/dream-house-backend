@@ -118,7 +118,7 @@
 
 
 
-const Society = require("../models/Society");
+const Society = require("../models/society");
 const Resident = require("../models/Resident");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
