@@ -48,7 +48,7 @@
 const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Society = require("../models/society");
+const Society = require("../models/Society");
 
 
 const loginAdmin = async (req, res) => {
