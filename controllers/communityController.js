@@ -162,55 +162,58 @@ message:error.message
 
 
 
+exports.deletePost = async (req, res) => {
+  try {
+    const post = await CommunityPost.findByIdAndDelete(req.params.id);
 
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 
 
 // COMMENT
+exports.addComment = async (req, res) => {
+  try {
+    const post = await CommunityPost.findById(req.params.id);
 
-exports.addComment = async(req,res)=>{
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
 
+    post.comments.push({
+      user: req.body.user,
+      text: req.body.text,
+    });
 
-try{
+    await post.save();
 
-
-const post =
-await CommunityPost.findById(req.params.id);
-
-
-
-post.comments.push({
-
-user:req.body.user || "Resident",
-
-text:req.body.text
-
-});
-
-
-await post.save();
-
-
-
-res.json({
-
-success:true,
-
-post
-
-});
-
-
-}
-catch(error){
-
-res.status(500).json({
-
-message:error.message
-
-});
-
-}
-
-
+    res.json({
+      success: true,
+      post,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

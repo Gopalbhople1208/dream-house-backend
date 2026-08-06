@@ -38,6 +38,8 @@ const {
 } = require("../controllers/residentController");
 
 router.post("/register", registerResident);
+router.post("/", registerResident);
+
 router.post("/login", loginResident);
 
 router.get("/", getAllResidents);

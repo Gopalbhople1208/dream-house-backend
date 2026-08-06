@@ -55,10 +55,30 @@ const societySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  verified: {
+  type: String,
+  enum: ["Yes", "No"],
+  default: "No",
+},
+ headWing: {
+    type: String,
+    default: "",  
+  },
+  headFlat: {
+    type: String,
+    default: "",  
+  },
+  verificationNo: {
+  type: String,
+  default: "",
+},
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-module.exports = mongoose.model("Society", societySchema);
+// module.exports = mongoose.model("Society", societySchema);
+module.exports =
+  mongoose.models.Society ||
+  mongoose.model("Society", societySchema);

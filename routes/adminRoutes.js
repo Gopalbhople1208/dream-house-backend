@@ -134,7 +134,21 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
+const {
+  loginAdmin,
+   getAllAdmins,
+     updateAdmin,
+     getAdminById,
+  deleteAdmin,
+} = require("../controllers/adminController");
 
+
+router.post("/login", loginAdmin);
+router.get("/", getAllAdmins);
+router.get("/:id", getAdminById);
+router.put("/:id", updateAdmin);
+
+router.delete("/:id", deleteAdmin);
 // ======================
 // Admin Login
 // ======================

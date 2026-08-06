@@ -122,6 +122,7 @@ const Society = require("../models/society");
 const Resident = require("../models/Resident");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Admin = require("../models/Admin");
 
 const createSociety = async (req, res) => {
   try {
@@ -139,7 +140,8 @@ const createSociety = async (req, res) => {
       headEmail,
       headPhone,
       password,
-    } = req.body;
+    } 
+    = req.body;
 
     if (
       !societyName || !registrationNo || !email || !phone ||
@@ -189,7 +191,27 @@ const createSociety = async (req, res) => {
       password: hash,
       phone: headPhone,
       address: `${address}, ${city}, ${state}`,
+      flat: "",
+  wing: "",
+  type: "Owner",
+  status: "Active",
     });
+
+    const admin = await Admin.create({
+  name: headName,
+  email: headEmail,
+  phone: headPhone,
+
+  // IMPORTANT:
+  // Admin model hashes password automatically.
+  password: password,
+
+  society: society._id,
+
+  role: "admin",
+
+  status: "Active",
+});
 
     const token = jwt.sign(
       { id: resident._id, email: resident.email, role: "society-admin" },
@@ -198,16 +220,17 @@ const createSociety = async (req, res) => {
     );
 
     res.status(201).json({
-      success: true,
-      message: "Society created successfully",
-      token,
-      society,
-      admin: {
-        id: resident._id,
-        name: resident.name,
-        email: resident.email,
-      },
-    });
+  success: true,
+  message: "Society Created Successfully",
+
+  token,
+
+  society,
+
+  resident,
+
+  admin,
+});
 
   } catch (err) {
     res.status(500).json({

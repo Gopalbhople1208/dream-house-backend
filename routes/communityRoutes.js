@@ -14,7 +14,8 @@ getPosts,
 
 likePost,
 
-addComment
+addComment,
+deletePost
 
 }=require("../controllers/communityController");
 
@@ -48,6 +49,8 @@ router.put(
 likePost
 );
 
+
+router.delete("/:id", deletePost);
 
 
 // comment

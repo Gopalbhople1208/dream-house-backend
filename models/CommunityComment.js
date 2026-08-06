@@ -42,7 +42,7 @@ const communityCommentSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model(
-  "CommunityComment",
-  communityCommentSchema
+module.exports = mongoose.model(
+"CommunityComment",
+communityCommentSchema
 );

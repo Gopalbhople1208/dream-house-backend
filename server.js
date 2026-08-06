@@ -216,7 +216,8 @@ const amenityRoutes = require("./routes/amenityRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
 //const communityRoutes = require("./routes/communityRoutes");
 const superAdminRoutes = require("./routes/superAdminRoutes");
-
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const settingRoutes = require("./routes/settingRoutes");
 
 const communityRoutes = require("./routes/communityRoutes");
 
@@ -246,6 +247,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+
+app.use("/api/settings", settingRoutes);
+const path = require("path");
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/visitors", visitorRoutes);
@@ -263,9 +268,10 @@ app.use(
     "/api/community",
     communityRoutes
 );
+
 app.use(
-"/uploads",
-express.static("uploads")
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
 );
 
 // Health check routes
