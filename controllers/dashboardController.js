@@ -1,4 +1,4 @@
-const Society = require("../models/society");
+const society = require("../models/society");
 const Resident = require("../models/Resident");
 const Staff = require("../models/Staff");
 const Amenity = require("../models/Amenity");
@@ -9,7 +9,7 @@ const Complaint = require("../models/Complaint");
 exports.getDashboardStats = async (req, res) => {
   try {
     const stats = {
-      societies: await Society.countDocuments(),
+      societies: await society.countDocuments(),
       residents: await Resident.countDocuments(),
       staff: await Staff.countDocuments(),
       amenities: await Amenity.countDocuments(),
@@ -28,7 +28,7 @@ exports.getDashboardStats = async (req, res) => {
 // Get All Societies
 exports.getAllSocieties = async (req, res) => {
   try {
-    const societies = await Society.find();
+    const societies = await society.find();
 
     res.json(societies);
   } catch (error) {
@@ -40,7 +40,7 @@ exports.getAllSocieties = async (req, res) => {
 
 exports.getSocietyById = async (req, res) => {
   try {
-    const society = await Society.findById(req.params.id);
+    const society = await society.findById(req.params.id);
 
     if (!society) {
       return res.status(404).json({
