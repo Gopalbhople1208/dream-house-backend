@@ -218,7 +218,7 @@ const maintenanceRoutes = require("./routes/maintenanceRoutes");
 const superAdminRoutes = require("./routes/superAdminRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const settingRoutes = require("./routes/settingRoutes");
-
+const contactRoutes = require("./routes/contactRoutes");
 const communityRoutes = require("./routes/communityRoutes");
 
 const app = express();
@@ -247,7 +247,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-
+app.use("/api/contact", contactRoutes);
 app.use("/api/settings", settingRoutes);
 const path = require("path");
 app.use("/api/dashboard", dashboardRoutes);
