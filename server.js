@@ -202,6 +202,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db");
 const residentRoutes = require("./routes/residentRoutes");
 const societyRoutes = require("./routes/societyRoutes");
@@ -249,7 +250,13 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/contact", contactRoutes);
 app.use("/api/settings", settingRoutes);
-const path = require("path");
+
+app.use(
+  "/uploads",
+  express.static(
+    path.join(__dirname, "uploads")
+  )
+);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/staff", staffRoutes);

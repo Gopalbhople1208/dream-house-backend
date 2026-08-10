@@ -227,9 +227,8 @@ exports.loginSuperAdmin = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const admin = await SuperAdmin.findById(req.params.id).select(
-      "-password"
-    );
+    const admin = await SuperAdmin.findById(req.params.id)
+      .select("-password");
 
     if (!admin) {
       return res.status(404).json({
@@ -249,7 +248,6 @@ exports.getProfile = async (req, res) => {
     });
   }
 };
-
 // ==========================
 // Create First Super Admin
 // (Run only once)
@@ -286,4 +284,53 @@ exports.createSuperAdmin = async (req, res) => {
     message: err.message || "Login failed",
   });
 }
+};
+exports.updateProfileImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select an image.",
+      });
+    }
+
+    const superadmin = await SuperAdmin.findById(id);
+
+    if (!superadmin) {
+      return res.status(404).json({
+        success: false,
+        message: "Super Admin not found.",
+      });
+    }
+
+    // IMPORTANT:
+    // File is stored in uploads/profile
+    superadmin.profileImage =
+      `/uploads/profile/${req.file.filename}`;
+
+    await superadmin.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully.",
+
+      superadmin: {
+        _id: superadmin._id,
+        name: superadmin.name,
+        email: superadmin.email,
+        role: superadmin.role,
+        status: superadmin.status,
+        profileImage: superadmin.profileImage,
+      },
+    });
+  } catch (error) {
+    console.error("Update Profile Image Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
