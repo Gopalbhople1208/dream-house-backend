@@ -226,18 +226,95 @@
 //   }
 // });
 
+// // module.exports = router;
+// const express = require("express");
+// const router = express.Router();
+// const Admin = require("../models/Admin");
+
+// const {
+//   loginAdmin,
+//   getAllAdmins,
+//   getAdminById,
+//   updateAdmin,
+//   updateProfileImage,
+//   deleteAdmin,
+// } = require("../controllers/adminController");
+
+// const upload = require("../middleware/adminUpload");
+
+// // Login
+// router.post("/login", loginAdmin);
+
+// // Get all admins
+// router.get("/", getAllAdmins);
+
+// // Profile route MUST come before /:id
+// router.get("/profile", async (req, res) => {
+//   try {
+//     const adminId = req.user?.id;
+
+//     if (!adminId) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Admin not authenticated",
+//       });
+//     }
+
+//     const admin = await Admin.findById(adminId)
+//       .populate("society")
+//       .select("-password");
+
+//     if (!admin) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Admin not found",
+//       });
+//     }
+
+//     res.json({
+//       success: true,
+//       admin,
+//     });
+//   } catch (error) {
+//     console.error("Profile Error:", error);
+
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// });
+
+// // Update profile image
+// router.put(
+//   "/:id/profile-image",
+//   upload.single("profileImage"),
+//   updateProfileImage
+// );
+
+// // Get admin by ID
+// // // router.get("/:id", getAdminById);
+// // api.get(`/admin/${storedAdmin._id}`)
+// router.get("/:id", getAdminById);
+
+// // Update admin
+// router.put("/:id", updateAdmin);
+
+// // Delete admin
+// router.delete("/:id", deleteAdmin);
+
 // module.exports = router;
+
 const express = require("express");
 const router = express.Router();
-const Admin = require("../models/Admin");
 
 const {
   loginAdmin,
   getAllAdmins,
   getAdminById,
   updateAdmin,
-  updateProfileImage,
   deleteAdmin,
+  updateProfileImage,
 } = require("../controllers/adminController");
 
 const upload = require("../middleware/adminUpload");
@@ -248,57 +325,18 @@ router.post("/login", loginAdmin);
 // Get all admins
 router.get("/", getAllAdmins);
 
-// Profile route MUST come before /:id
-router.get("/profile", async (req, res) => {
-  try {
-    const adminId = req.user?.id;
+// Get admin by ID
+router.get("/:id", getAdminById);
 
-    if (!adminId) {
-      return res.status(401).json({
-        success: false,
-        message: "Admin not authenticated",
-      });
-    }
+// Update admin
+router.put("/:id", updateAdmin);
 
-    const admin = await Admin.findById(adminId)
-      .populate("society")
-      .select("-password");
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      admin,
-    });
-  } catch (error) {
-    console.error("Profile Error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// Update profile image
+// Upload admin profile image
 router.put(
   "/:id/profile-image",
   upload.single("profileImage"),
   updateProfileImage
 );
-
-// Get admin by ID
-// // router.get("/:id", getAdminById);
-// api.get(`/admin/${storedAdmin._id}`)
-router.get("/:id", getAdminById);
-
-// Update admin
-router.put("/:id", updateAdmin);
 
 // Delete admin
 router.delete("/:id", deleteAdmin);
