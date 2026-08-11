@@ -307,8 +307,11 @@ exports.updateProfileImage = async (req, res) => {
 
     // IMPORTANT:
     // File is stored in uploads/profile
+    // superadmin.profileImage =
+    //   `/uploads/profile/${req.file.filename}`;
+
     superadmin.profileImage =
-      `/uploads/profile/${req.file.filename}`;
+  `/uploads/community/${req.file.filename}`;
 
     await superadmin.save();
 
