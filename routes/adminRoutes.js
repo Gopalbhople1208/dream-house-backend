@@ -129,95 +129,178 @@
 
 // module.exports = router;
 
+// const express = require("express");
+// const router = express.Router();
+// const bcrypt = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
+// const Admin = require("../models/Admin");
+// const {
+//   loginAdmin,
+//    getAllAdmins,
+//      updateAdmin,
+//      getAdminById,
+//   deleteAdmin,
+// } = require("../controllers/adminController");
+
+
+// router.post("/login", loginAdmin);
+// router.get("/", getAllAdmins);
+// router.get("/:id", getAdminById);
+// router.put("/:id", updateAdmin);
+
+// router.delete("/:id", deleteAdmin);
+// // ======================
+// // Admin Login
+// // ======================
+// router.post("/login", async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Email and Password are required",
+//       });
+//     }
+
+//     // Find admin from Admin collection
+//     const admin = await Admin.findOne({
+//       email: email.toLowerCase(),
+//     });
+
+//     if (!admin) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Admin Email or Password",
+//       });
+//     }
+
+//     // Compare password
+//     const isMatch = await bcrypt.compare(password, admin.password);
+
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Admin Email or Password",
+//       });
+//     }
+
+//     router.put(
+//   "/:id/profile-image",
+//   upload.single("profileImage"),
+//   updateProfileImage
+// );
+
+//     // Create JWT
+//     const token = jwt.sign(
+//       {
+//         id: admin._id,
+//         email: admin.email,
+//         role: admin.role,
+//       },
+//       process.env.JWT_SECRET || "your_jwt_secret_key",
+//       {
+//         expiresIn: "7d",
+//       }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Admin Login Successful",
+//       token,
+//       admin: {
+//         id: admin._id,
+//         name: admin.name,
+//         email: admin.email,
+//         role: admin.role,
+//         status: admin.status,
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Admin Login Error:", err);
+
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
+
+// module.exports = router;
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
+
 const {
   loginAdmin,
-   getAllAdmins,
-     updateAdmin,
-     getAdminById,
+  getAllAdmins,
+  getAdminById,
+  updateAdmin,
+  updateProfileImage,
   deleteAdmin,
 } = require("../controllers/adminController");
 
+const upload = require("../middleware/adminUpload");
 
+// Login
 router.post("/login", loginAdmin);
+
+// Get all admins
 router.get("/", getAllAdmins);
-router.get("/:id", getAdminById);
-router.put("/:id", updateAdmin);
 
-router.delete("/:id", deleteAdmin);
-// ======================
-// Admin Login
-// ======================
-router.post("/login", async (req, res) => {
+// Profile route MUST come before /:id
+router.get("/profile", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const adminId = req.user?.id;
 
-    if (!email || !password) {
-      return res.status(400).json({
+    if (!adminId) {
+      return res.status(401).json({
         success: false,
-        message: "Email and Password are required",
+        message: "Admin not authenticated",
       });
     }
 
-    // Find admin from Admin collection
-    const admin = await Admin.findOne({
-      email: email.toLowerCase(),
-    });
+    const admin = await Admin.findById(adminId)
+      .populate("society")
+      .select("-password");
 
     if (!admin) {
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: "Invalid Admin Email or Password",
+        message: "Admin not found",
       });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, admin.password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid Admin Email or Password",
-      });
-    }
-
-    // Create JWT
-    const token = jwt.sign(
-      {
-        id: admin._id,
-        email: admin.email,
-        role: admin.role,
-      },
-      process.env.JWT_SECRET || "your_jwt_secret_key",
-      {
-        expiresIn: "7d",
-      }
-    );
-
-    res.status(200).json({
+    res.json({
       success: true,
-      message: "Admin Login Successful",
-      token,
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
-        status: admin.status,
-      },
+      admin,
     });
-  } catch (err) {
-    console.error("Admin Login Error:", err);
+  } catch (error) {
+    console.error("Profile Error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
     });
   }
 });
+
+// Update profile image
+router.put(
+  "/:id/profile-image",
+  upload.single("profileImage"),
+  updateProfileImage
+);
+
+// Get admin by ID
+// // router.get("/:id", getAdminById);
+// api.get(`/admin/${storedAdmin._id}`)
+router.get("/:id", getAdminById);
+
+// Update admin
+router.put("/:id", updateAdmin);
+
+// Delete admin
+router.delete("/:id", deleteAdmin);
 
 module.exports = router;
