@@ -38,6 +38,10 @@ const residentSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    profileImage: {
+  type: String,
+  default: "",
+},
     type: {
       type: String,
       default: "Owner",

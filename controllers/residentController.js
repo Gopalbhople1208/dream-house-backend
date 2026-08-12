@@ -203,6 +203,50 @@ const deleteResident = async (req, res) => {
 };
 
 
+// =============================
+// UPDATE RESIDENT PROFILE IMAGE
+// =============================
+const updateResidentProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select an image",
+      });
+    }
+
+    const resident = await Resident.findById(req.params.id);
+
+    if (!resident) {
+      return res.status(404).json({
+        success: false,
+        message: "Resident not found",
+      });
+    }
+
+    resident.profileImage =
+      `/uploads/resident/${req.file.filename}`;
+
+    await resident.save();
+
+    const updatedResident = await Resident.findById(
+      resident._id
+    ).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully",
+      resident: updatedResident,
+    });
+  } catch (error) {
+    console.error("Resident Image Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // Get Logged-in Resident Profile
 const getResidentProfile = async (req, res) => {
   try {
@@ -235,6 +279,8 @@ module.exports = {
   getAllResidents,
   getResidentById,
   updateResident,
+
+  updateResidentProfileImage,
    getResidentProfile,
   deleteResident,
 };
